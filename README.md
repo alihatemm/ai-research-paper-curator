@@ -1,348 +1,533 @@
-# The Mother of AI Project
-## Phase 1 RAG Systems: arXiv Paper Curator
+# AI Research Paper Curator
 
-<div align="center">
-  <h3>A Learner-Focused Journey into Production RAG Systems</h3>
-  <p>Learn to build modern AI systems from the ground up through hands-on implementation</p>
-  <p>Master the most in-demand AI engineering skills: <strong>RAG (Retrieval-Augmented Generation)</strong></p>
-</div>
+An AI engineering project for automatically ingesting, processing, storing, and retrieving academic research papers using a production-style Retrieval-Augmented Generation (RAG) architecture.
+
+The system currently provides the infrastructure and ingestion foundation for a research assistant that can collect papers from arXiv, parse scientific PDFs, store structured paper data, and prepare that content for retrieval and LLM-based research workflows.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.12+-blue.svg" alt="Python Version">
   <img src="https://img.shields.io/badge/FastAPI-0.115+-green.svg" alt="FastAPI">
   <img src="https://img.shields.io/badge/OpenSearch-2.19-orange.svg" alt="OpenSearch">
   <img src="https://img.shields.io/badge/Docker-Compose-blue.svg" alt="Docker">
-  <img src="https://img.shields.io/badge/Status-Week%202%20Ready-brightgreen.svg" alt="Status">
+  <img src="https://img.shields.io/badge/Status-Active%20Development-brightgreen.svg" alt="Status">
 </p>
-
-</br>
 
 <p align="center">
-  <a href="#-about-this-course">
-    <img src="static/mother_of_ai_project_rag_architecture.gif" alt="RAG Architecture" width="700">
-  </a>
+  <img src="static/mother_of_ai_project_rag_architecture.gif" alt="RAG System Architecture" width="800">
 </p>
 
-## 📖 About This Course
+## Overview
 
-This is a **learner-focused project** where you'll build a complete research assistant system that automatically fetches academic papers, understands their content, and answers your research questions using advanced RAG techniques.
+The goal of this project is to build an end-to-end AI research assistant around academic papers.
 
-**The arXiv Paper Curator** will teach you to build a **production-grade RAG system using industry best practices**. You'll master the architecture, implementation, and deployment of AI systems that professionals use in the real world.
+Rather than treating RAG as only an LLM prompt, the project focuses on the full engineering pipeline behind the system:
 
-By the end of this course, you'll have your own AI research assistant and the skills to build similar systems for any domain.
+- research paper ingestion
+- scientific PDF processing
+- workflow orchestration
+- structured data storage
+- search infrastructure
+- API development
+- local LLM serving
+- testing and monitoring
+- retrieval and generation workflows
 
----
+The current implementation includes the infrastructure layer and automated research-paper ingestion pipeline.
 
-## 🚀 Quick Start
+## Current Features
 
-### **📋 Prerequisites**
-- **Docker Desktop** (with Docker Compose)  
-- **Python 3.12+**
-- **UV Package Manager** ([Install Guide](https://docs.astral.sh/uv/getting-started/installation/))
-- **8GB+ RAM** and **20GB+ free disk space**
+### Infrastructure
 
-### **⚡ Get Started**
+- FastAPI backend with health checks and interactive API documentation
+- PostgreSQL for research-paper metadata and processed content
+- OpenSearch for search and retrieval infrastructure
+- Apache Airflow for workflow orchestration
+- Ollama for local LLM serving
+- Docker Compose for multi-service orchestration
+- Pytest, Ruff, and MyPy for testing and code quality
 
-```bash
-# 1. Clone and setup
-git clone <repository-url>
-cd zero_to_RAG
-uv sync
+### Research Paper Ingestion
 
-# 2. Start all services
-docker compose up --build -d
+- arXiv API integration
+- Rate limiting and retry handling
+- Automated paper metadata retrieval
+- Scientific PDF processing using Docling
+- Structured content extraction from research papers
+- PostgreSQL persistence
+- Automated Airflow ingestion workflows
+- API endpoints for accessing stored papers
 
-# 3. Verify everything works
-curl http://localhost:8000/health
+## System Architecture
+
+The project is designed as a multi-stage AI data pipeline:
+
+```text
+                 arXiv
+                   |
+                   v
+          +------------------+
+          | Apache Airflow   |
+          | Ingestion DAGs   |
+          +------------------+
+                   |
+                   v
+          +------------------+
+          | Metadata Fetcher |
+          +------------------+
+             |           |
+             v           v
+       arXiv API     PDF Download
+                         |
+                         v
+                  +---------------+
+                  |    Docling    |
+                  | PDF Processing|
+                  +---------------+
+                         |
+                         v
+                  +---------------+
+                  |  PostgreSQL   |
+                  | Paper Storage |
+                  +---------------+
+                         |
+                         v
+                  +---------------+
+                  |  OpenSearch   |
+                  | Search Layer  |
+                  +---------------+
+                         |
+                         v
+                  +---------------+
+                  |    FastAPI    |
+                  | Backend/API   |
+                  +---------------+
+                         |
+                         v
+                  +---------------+
+                  |    Ollama     |
+                  |  Local LLM    |
+                  +---------------+
 ```
 
-### **📊 Access Your Services**
+The retrieval and full RAG generation stages are being developed on top of this foundation.
 
-| Service | URL | Purpose |
-|---------|-----|---------|
-| **API Documentation** | http://localhost:8000/docs | Interactive API testing |
-| **Airflow Dashboard** | http://localhost:8080 | Workflow management |
-| **OpenSearch Dashboards** | http://localhost:5601 | Hybrid search engine UI |
+## Tech Stack
 
-#### **NOTE**: Check airflow/simple_auth_manager_passwords.json.generated for Airflow username and password
----
+| Area | Technologies |
+|------|--------------|
+| Programming | Python 3.12+ |
+| Backend | FastAPI, Pydantic |
+| Database | PostgreSQL 16 |
+| Search | OpenSearch 2.19 |
+| Workflow Orchestration | Apache Airflow 3.0 |
+| PDF Processing | Docling |
+| LLM Serving | Ollama |
+| Infrastructure | Docker, Docker Compose |
+| Package Management | uv |
+| Testing | Pytest |
+| Code Quality | Ruff, MyPy |
+| Source Control | Git, GitHub |
 
-## 📚 Week 1: Infrastructure Foundation ✅
+## How It Works
 
-**Start here!** Master the infrastructure that powers modern RAG systems.
+### 1. Paper Discovery
 
-### **🎯 Learning Objectives**
-- Complete infrastructure setup with Docker Compose
-- FastAPI development with automatic documentation and health checks
-- PostgreSQL database configuration and management
-- OpenSearch hybrid search engine setup
-- Ollama local LLM service configuration
-- Service orchestration and health monitoring
-- Professional development environment with code quality tools
+The ingestion workflow queries the arXiv API for academic papers matching a research category or search query.
 
-### **🏗️ Architecture Overview**
-
-<p align="center">
-  <img src="static/week1_infra_setup.png" alt="Week 1 Infrastructure Setup" width="800">
-</p>
-
-**Infrastructure Components:**
-- **FastAPI**: REST endpoints with async support (Port 8000)  
-- **PostgreSQL 16**: Paper metadata storage (Port 5432)
-- **OpenSearch 2.19**: Search engine with dashboards (Ports 9200, 5601)
-- **Apache Airflow 3.0**: Workflow orchestration (Port 8080)
-- **Ollama**: Local LLM server (Port 11434)
-
-### **📓 Setup Guide**
-
-```bash
-# Launch the Week 1 notebook
-uv run jupyter notebook notebooks/week1/week1_setup.ipynb
-```
-
-### **✅ Success Criteria**
-Complete when you can:
-- [ ] Start all services with `docker compose up -d`
-- [ ] Access API docs at http://localhost:8000/docs  
-- [ ] Login to Airflow at http://localhost:8080
-- [ ] Browse OpenSearch at http://localhost:5601
-- [ ] All tests pass: `uv run pytest`
-
-### **📖 Deep Dive**
-**Blog Post:** [The Infrastructure That Powers RAG Systems](https://jamwithai.substack.com/p/the-infrastructure-that-powers-rag) - Detailed walkthrough and production insights
-
----
-
-## 📚 Week 2: Data Ingestion Pipeline ✅
-
-**Building on Week 1 infrastructure:** Learn to fetch, process, and store academic papers automatically.
-
-### **🎯 Learning Objectives**
-- arXiv API integration with rate limiting and retry logic
-- Scientific PDF parsing using Docling
-- Automated data ingestion pipelines with Apache Airflow
-- Metadata extraction and storage workflows
-- Complete paper processing from API to database
-
-### **🏗️ Architecture Overview**
-
-<p align="center">
-  <img src="static/week2_data_ingestion_flow.png" alt="Week 2 Data Ingestion Architecture" width="800">
-</p>
-
-**Data Pipeline Components:**
-- **MetadataFetcher**: 🎯 Main orchestrator coordinating the entire pipeline
-- **ArxivClient**: Rate-limited paper fetching with retry logic
-- **PDFParserService**: Docling-powered scientific document processing  
-- **Airflow DAGs**: Automated daily paper ingestion workflows
-- **PostgreSQL Storage**: Structured paper metadata and content
-
-### **📓 Implementation Guide**
-
-```bash
-# Launch the Week 2 notebook  
-uv run jupyter notebook notebooks/week2/week2_arxiv_integration.ipynb
-```
-
-### **💻 Code Examples**
-
-**arXiv API Integration:**
 ```python
-# Example: Fetch papers with rate limiting
 from src.services.arxiv.factory import make_arxiv_client
 
 async def fetch_recent_papers():
     client = make_arxiv_client()
+
     papers = await client.search_papers(
         query="cat:cs.AI",
         max_results=10,
         from_date="20240801",
-        to_date="20240807"
+        to_date="20240807",
     )
+
     return papers
 ```
 
-**PDF Processing Pipeline:**
+### 2. PDF Processing
+
+The system downloads and parses research-paper PDFs using Docling.
+
 ```python
-# Example: Parse PDF with Docling
 from src.services.pdf_parser.factory import make_pdf_parser_service
 
 async def process_paper_pdf(pdf_url: str):
     parser = make_pdf_parser_service()
     parsed_content = await parser.parse_pdf_from_url(pdf_url)
-    return parsed_content  # Structured content with text, tables, figures
+
+    return parsed_content
 ```
 
-**Complete Ingestion Workflow:**
+This produces structured content that can later be used for indexing, chunking, retrieval, and LLM context.
+
+### 3. Automated Ingestion
+
+A metadata-fetching service coordinates the ingestion pipeline.
+
 ```python
-# Example: Full paper ingestion pipeline
 from src.services.metadata_fetcher import make_metadata_fetcher
 
 async def ingest_papers():
     fetcher = make_metadata_fetcher()
+
     results = await fetcher.fetch_and_store_papers(
         query="cat:cs.AI",
         max_results=5,
-        from_date="20240807"
+        from_date="20240807",
     )
-    return results  # Papers stored in database with full content
+
+    return results
 ```
 
-### **✅ Success Criteria**
-Complete when you can:
-- [ ] Fetch papers from arXiv API: Test in Week 2 notebook
-- [ ] Parse PDF content with Docling: View extracted structured content
-- [ ] Run Airflow DAG: `arxiv_paper_ingestion` executes successfully
-- [ ] Verify database storage: Papers appear in PostgreSQL with full content
-- [ ] API endpoints work: `/papers` returns stored papers with metadata
+Apache Airflow automates this workflow so new papers can be collected and processed on a schedule.
 
-### **📖 Deep Dive**
-**Blog Post:** [Building Data Ingestion Pipelines for RAG](https://jamwithai.substack.com/p/bringing-your-rag-system-to-life) - arXiv API integration and PDF processing
+### 4. Storage
 
----
+Processed research-paper metadata and content are stored in PostgreSQL.
 
-## 📚 Future Weeks: Complete RAG System
+OpenSearch provides the search infrastructure used as the project moves toward hybrid retrieval and full RAG functionality.
 
-**Building on Weeks 1-2 foundation:** Advanced RAG techniques and production deployment.
+### 5. API Access
 
-### **Future Weeks Overview** (6-Week Course)
-- **Week 3:** OpenSearch hybrid search implementation with BM25 + semantic vectors
-- **Week 4:** Context-aware chunking and retrieval evaluation with nDCG metrics
-- **Week 5:** Full RAG pipeline with LLM integration and prompt optimization
-- **Week 6:** Observability with Langfuse, A/B testing, and production deployment
+FastAPI exposes application functionality through REST endpoints and provides interactive documentation through Swagger UI.
 
----
+## Quick Start
 
-## 🔧 Reference & Development Guide
+### Prerequisites
 
-### **🛠️ Technology Stack**
+Make sure the following are installed:
 
-| Service | Purpose | Status |
-|---------|---------|--------|
-| **FastAPI** | REST API with automatic docs | ✅ Ready |
-| **PostgreSQL 16** | Paper metadata and content storage | ✅ Ready |
-| **OpenSearch 2.19** | Hybrid search engine | ✅ Ready |
-| **Apache Airflow 3.0** | Workflow automation | ✅ Ready |
-| **Ollama** | Local LLM serving | ✅ Ready |
+- Docker Desktop with Docker Compose
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- At least 8 GB RAM
+- Approximately 20 GB of available disk space
 
-**Development Tools:** UV, Ruff, MyPy, Pytest, Docker Compose
+### Clone the Repository
 
-### **🏗️ Project Structure**
-
-```
-zero_to_RAG/
-├── src/                                    # Main application code
-│   ├── main.py                             # FastAPI application
-│   ├── routers/                            # API endpoints
-│   ├── models/                             # Database models (SQLAlchemy)
-│   ├── repositories/                       # Data access layer
-│   ├── schemas/                            # Pydantic validation schemas
-│   ├── services/                           # Business logic
-│   │   ├── arxiv/                          # ✨ NEW: arXiv API client
-│   │   ├── pdf_parser/                     # ✨ NEW: Docling PDF processing
-│   │   ├── metadata_fetcher.py             # ✨ NEW: Complete ingestion pipeline
-│   │   └── ollama/                         # Ollama LLM service
-│   ├── db/                                 # Database configuration
-│   ├── config.py                           # Environment configuration
-│   └── dependencies.py                     # Dependency injection
-│
-├── notebooks/                              # Learning materials
-│   ├── week1/                              # Week 1: Infrastructure setup
-│   │   └── week1_setup.ipynb               # Complete setup guide
-│   └── week2/                              # ✨ NEW: Week 2 materials
-│       └── week2_data_ingestion.ipynb      # Data pipeline guide
-│
-├── airflow/                                # Workflow orchestration
-│   ├── dags/                               # Workflow definitions
-│   │   ├── arxiv_ingestion/                # ✨ NEW: arXiv ingestion modules
-│   │   └── arxiv_paper_ingestion.py        # ✨ NEW: Main ingestion DAG
-│   └── requirements-airflow.txt            # ✨ NEW: Airflow dependencies
-│
-├── tests/                                  # Comprehensive test suite
-├── static/                                 # Assets (images, GIFs)
-└── compose.yml                             # Service orchestration
-```
-
-### **🔧 Essential Commands**
-
-#### **Using the Makefile** (Recommended)
 ```bash
-# View all available commands
-make help
-
-# Quick workflow
-make start         # Start all services
-make health        # Check all services health
-make test          # Run tests
-make stop          # Stop services
+git clone https://github.com/alihatemm/ai-research-paper-curator.git
+cd ai-research-paper-curator
 ```
 
-#### **All Available Commands**
+### Install Dependencies
+
+```bash
+uv sync
+```
+
+### Start the Services
+
+```bash
+docker compose up --build -d
+```
+
+### Check System Health
+
+```bash
+curl http://localhost:8000/health
+```
+
+## Local Services
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| FastAPI Docs | http://localhost:8000/docs | API testing and documentation |
+| Airflow | http://localhost:8080 | Workflow orchestration |
+| OpenSearch Dashboards | http://localhost:5601 | Search engine interface |
+
+> Airflow credentials can be found in `airflow/simple_auth_manager_passwords.json.generated` after setup.
+
+## Infrastructure
+
+The project currently runs several services locally through Docker Compose.
+
+### FastAPI
+
+Provides the backend application and API layer.
+
+**Port:** `8000`
+
+### PostgreSQL
+
+Stores paper metadata and processed research content.
+
+**Port:** `5432`
+
+### OpenSearch
+
+Provides the search infrastructure for the RAG retrieval layer.
+
+**Ports:** `9200`, `5601`
+
+### Apache Airflow
+
+Schedules and manages the research-paper ingestion pipeline.
+
+**Port:** `8080`
+
+### Ollama
+
+Provides local LLM serving for the generation layer of the system.
+
+**Port:** `11434`
+
+## Airflow Data Pipeline
+
+The ingestion pipeline currently includes:
+
+```text
+Scheduled Airflow DAG
+        |
+        v
+Search arXiv
+        |
+        v
+Fetch Paper Metadata
+        |
+        v
+Download PDF
+        |
+        v
+Parse PDF with Docling
+        |
+        v
+Extract Structured Content
+        |
+        v
+Store Paper + Content
+        |
+        v
+PostgreSQL
+```
+
+The main components include:
+
+- `MetadataFetcher` — coordinates the ingestion workflow
+- `ArxivClient` — retrieves papers with rate limiting and retry logic
+- `PDFParserService` — parses scientific PDFs using Docling
+- `Airflow DAGs` — automate ingestion
+- `PostgreSQL` — stores metadata and extracted content
+
+## Project Structure
+
+```text
+ai-research-paper-curator/
+├── airflow/
+│   ├── dags/
+│   │   ├── arxiv_ingestion/
+│   │   └── arxiv_paper_ingestion.py
+│   └── requirements-airflow.txt
+│
+├── notebooks/
+│   ├── week1/
+│   │   └── week1_setup.ipynb
+│   └── week2/
+│       └── week2_data_ingestion.ipynb
+│
+├── src/
+│   ├── main.py
+│   ├── routers/
+│   ├── models/
+│   ├── repositories/
+│   ├── schemas/
+│   ├── services/
+│   │   ├── arxiv/
+│   │   ├── pdf_parser/
+│   │   ├── metadata_fetcher.py
+│   │   └── ollama/
+│   ├── db/
+│   ├── config.py
+│   └── dependencies.py
+│
+├── static/
+├── tests/
+├── .env.example
+├── .gitignore
+├── .pre-commit-config.yaml
+├── Dockerfile
+├── LICENSE
+├── Makefile
+├── README.md
+├── compose.yml
+├── pyproject.toml
+└── uv.lock
+```
+
+## Running the Project
+
+### Using the Makefile
+
+```bash
+make help
+```
+
+Common commands:
+
+```bash
+make start
+make health
+make test
+make stop
+```
+
 | Command | Description |
 |---------|-------------|
 | `make start` | Start all services |
 | `make stop` | Stop all services |
-| `make restart` | Restart all services |
+| `make restart` | Restart services |
 | `make status` | Show service status |
-| `make logs` | Show service logs |
-| `make health` | Check all services health |
-| `make setup` | Install Python dependencies |
+| `make logs` | View service logs |
+| `make health` | Check service health |
+| `make setup` | Install dependencies |
 | `make format` | Format code |
-| `make lint` | Lint and type check |
+| `make lint` | Run linting and type checks |
 | `make test` | Run tests |
 | `make test-cov` | Run tests with coverage |
-| `make clean` | Clean up everything |
+| `make clean` | Clean local resources |
 
-#### **Direct Commands** (Alternative)
+### Direct Commands
+
 ```bash
-# If you prefer using commands directly
-docker compose up --build -d    # Start services
-docker compose ps               # Check status
-docker compose logs            # View logs
-uv run pytest                 # Run tests
+docker compose up --build -d
+docker compose ps
+docker compose logs
+uv run pytest
 ```
 
-### **🎓 Target Audience**
-| Who | Why |
-|-----|-----|
-| **AI/ML Engineers** | Learn production RAG architecture beyond tutorials |
-| **Software Engineers** | Build end-to-end AI applications with best practices |
-| **Data Scientists** | Implement production AI systems using modern tools |
+## Testing
 
----
+The project includes a test suite under:
 
-## 🛠️ Troubleshooting
+```text
+tests/
+```
 
-**Common Issues:**
-- **Services not starting?** Wait 2-3 minutes, check `docker compose logs`
-- **Port conflicts?** Stop other services using ports 8000, 8080, 5432, 9200
-- **Memory issues?** Increase Docker Desktop memory allocation
+Run all tests with:
 
-**Get Help:**
-- Check the comprehensive Week 1 notebook troubleshooting section
-- Review service logs: `docker compose logs [service-name]`
-- Complete reset: `docker compose down --volumes && docker compose up --build -d`
+```bash
+uv run pytest
+```
 
----
+Or:
 
-## 💰 Cost Structure
+```bash
+make test
+```
 
-**This course is completely free!** You'll only need minimal costs for optional services:
-- **Local Development:** $0 (everything runs locally)
-- **Optional Cloud APIs:** ~$2-5 for external LLM services (if chosen)
+For coverage:
 
----
+```bash
+make test-cov
+```
 
-<div align="center">
-  <h3>🎉 Ready to Start Your AI Engineering Journey?</h3>
-  <p><strong>Begin with the Week 1 setup notebook and build your first production RAG system!</strong></p>
-  
-  <p><em>For learners who want to master modern AI engineering</em></p>
-  <p><strong>Built with love by Jam With AI</strong></p>
-</div>
+## Development Roadmap
 
----
+The infrastructure and ingestion pipeline provide the foundation for the full RAG system.
 
-## 📄 License
+### Completed
 
-MIT License - see [LICENSE](LICENSE) file for details.
+- [x] Docker-based infrastructure
+- [x] FastAPI application
+- [x] PostgreSQL integration
+- [x] OpenSearch infrastructure
+- [x] Airflow orchestration
+- [x] Ollama local LLM service
+- [x] arXiv API integration
+- [x] PDF processing with Docling
+- [x] Automated paper ingestion
+- [x] Metadata and content storage
+
+### In Progress / Planned
+
+- [ ] Hybrid retrieval using BM25 and semantic vectors
+- [ ] Context-aware paper chunking
+- [ ] Embedding generation
+- [ ] Retrieval evaluation using ranking metrics such as nDCG
+- [ ] Full retrieval-augmented generation pipeline
+- [ ] Prompt optimization
+- [ ] LLM response evaluation
+- [ ] Langfuse observability
+- [ ] A/B testing
+- [ ] Production deployment
+
+## What I'm Learning
+
+This project is helping me build practical experience with:
+
+- designing multi-service AI systems
+- building backend APIs with FastAPI
+- working with asynchronous Python
+- building automated data pipelines
+- orchestrating workflows with Airflow
+- processing scientific documents
+- designing database-backed applications
+- using OpenSearch as retrieval infrastructure
+- running LLMs locally
+- containerizing services with Docker
+- testing and debugging distributed application components
+- understanding how production RAG systems are structured beyond just the LLM layer
+
+## Troubleshooting
+
+### Services are not starting
+
+Wait a few minutes after starting the stack and inspect the logs:
+
+```bash
+docker compose logs
+```
+
+### Port conflicts
+
+Check whether another service is using:
+
+```text
+8000
+8080
+5432
+9200
+5601
+11434
+```
+
+### Docker memory issues
+
+Increase the amount of memory allocated to Docker Desktop.
+
+### Reset the Environment
+
+```bash
+docker compose down --volumes
+docker compose up --build -d
+```
+
+## Project Origin
+
+This project began from the **Jam With AI "Mother of AI" / arXiv Paper Curator learning project**.
+
+I am using the original project as a structured foundation for learning production AI engineering while implementing, running, testing, understanding, and extending the system through each stage of the RAG pipeline.
+
+Original educational material and architecture concepts are credited to **Jam With AI**.
+
+My goal with this repository is to develop hands-on experience with the engineering behind production RAG systems rather than treating the project as a finished black-box implementation.
+
+## Author
+
+**Ali Hatem**
+
+Computer Science @ Florida International University
+
+Interested in software engineering, AI/ML, backend development, and AI infrastructure.
+
+[LinkedIn](https://www.linkedin.com/in/alihatemm) | [GitHub](https://github.com/alihatemm)
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
